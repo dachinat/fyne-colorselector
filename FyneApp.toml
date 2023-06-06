@@ -2,7 +2,7 @@ Website = "https://github.com/dachinat/fyne-colorselector"
 
 [Details]
   Icon = "Icon.png"
-  Name = "Screenshots"
+  Name = "Color Selector"
   ID = "com.dachinat.colorselector"
   Version = "1.0.0"
-  Build = 1
+  Build = 2

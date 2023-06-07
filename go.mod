@@ -4,6 +4,7 @@ go 1.18
 
 require (
 	fyne.io/fyne/v2 v2.3.5
+	github.com/atotto/clipboard v0.1.4
 	github.com/dachinat/colornameconv v0.1.5
 	github.com/lusingander/colorpicker v0.7.1
 )

@@ -4,10 +4,13 @@ import (
 	"fmt"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
+	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/layout"
+	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
+	"github.com/atotto/clipboard"
 	"github.com/dachinat/colornameconv"
 	"github.com/lusingander/colorpicker"
 	"image/color"
@@ -16,6 +19,7 @@ import (
 var (
 	defaultColor = color.NRGBA{0xff, 0x00, 0x00, 0xff}
 	selectedType = "Hue"
+	selectedHex  = ""
 )
 
 func main() {
@@ -26,10 +30,17 @@ func main() {
 
 	label := widget.NewLabel(labelText)
 
-	content := container.New(layout.NewCenterLayout(), label)
+	btn2 := widget.NewButtonWithIcon("Copy Hex", theme.ContentCopyIcon(), func() {
+		clipboard.WriteAll(selectedHex)
+	})
+
+	contentLabel := container.New(layout.NewCenterLayout(), label)
+	contentBtn := container.New(layout.NewCenterLayout(), btn2)
+	contentRect := canvas.NewRectangle(color.White)
+	content := container.NewGridWithRows(3, contentRect, contentLabel, contentBtn)
 
 	btn := widget.NewButton("Browse Colors", func() {
-		openPicker(w, label)
+		openPicker(w, label, contentRect)
 	})
 
 	choices := widget.NewSelect([]string{"Hue", "Hue Circle", "Value", "Saturation"}, func(value string) {
@@ -46,7 +57,7 @@ func main() {
 	w.ShowAndRun()
 }
 
-func openPicker(w fyne.Window, l *widget.Label) {
+func openPicker(w fyne.Window, l *widget.Label, r *canvas.Rectangle) {
 	//d := dialog.NewColorPicker("Pick a color", "Browse colors", func(c color.Color) {
 	//	hex := colorToHex(c)
 	//	l.Text = hex + " " + HexToName(hex)
@@ -73,8 +84,13 @@ func openPicker(w fyne.Window, l *widget.Label) {
 	picker := colorpicker.New(200, styleType)
 	picker.SetOnChanged(func(c color.Color) {
 		hex := colorToHex(c)
-		l.Text = hex + " " + HexToName(hex)
+		l.Text = hex + " (" + HexToName(hex) + ")"
 		l.Refresh()
+
+		r.FillColor = c
+		r.Refresh()
+
+		selectedHex = hex
 	})
 	content := fyne.NewContainer(picker)
 

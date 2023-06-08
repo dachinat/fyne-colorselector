@@ -5,4 +5,4 @@ Website = "https://github.com/dachinat/fyne-colorselector"
   Name = "Color Selector"
   ID = "com.dachinat.colorselector"
   Version = "1.0.0"
-  Build = 2
+  Build = 3

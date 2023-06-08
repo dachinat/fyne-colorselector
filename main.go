@@ -17,9 +17,10 @@ import (
 )
 
 var (
-	defaultColor = color.NRGBA{0xff, 0x00, 0x00, 0xff}
-	selectedType = "Hue"
-	selectedHex  = ""
+	defaultColor  = color.NRGBA{0xff, 0x00, 0x00, 0xff}
+	selectedType  = "Hue"
+	selectedHex   = ""
+	currentSimple color.Color
 )
 
 func main() {
@@ -36,8 +37,9 @@ func main() {
 
 	contentLabel := container.New(layout.NewCenterLayout(), label)
 	contentBtn := container.New(layout.NewCenterLayout(), btn2)
-	contentRect := canvas.NewRectangle(color.White)
-	content := container.NewGridWithRows(3, contentRect, contentLabel, contentBtn)
+	contentRect := canvas.NewRectangle(defaultColor)
+	contentRect.SetMinSize(fyne.NewSize(75, 75))
+	content := container.NewBorder(contentLabel, contentBtn, nil, nil, container.NewCenter(contentRect))
 
 	btn := widget.NewButton("Browse Colors", func() {
 		openPicker(w, label, contentRect)
@@ -46,6 +48,8 @@ func main() {
 	choices := widget.NewSelect([]string{"Hue", "Hue Circle", "Value", "Saturation"}, func(value string) {
 		selectedType = value
 	})
+
+	choices.SetSelected("Hue")
 
 	top := container.NewGridWithColumns(2, btn, choices)
 
@@ -67,9 +71,6 @@ func openPicker(w fyne.Window, l *widget.Label, r *canvas.Rectangle) {
 	//
 	//d.Show()
 
-	var currentSimple color.Color
-	currentSimple = defaultColor
-
 	var styleType colorpicker.PickerStyle
 	if selectedType == "Hue" {
 		styleType = colorpicker.StyleHue
@@ -82,6 +83,13 @@ func openPicker(w fyne.Window, l *widget.Label, r *canvas.Rectangle) {
 	}
 
 	picker := colorpicker.New(200, styleType)
+
+	if currentSimple != nil {
+		picker.SetColor(currentSimple)
+	} else {
+		picker.SetColor(defaultColor)
+	}
+
 	picker.SetOnChanged(func(c color.Color) {
 		hex := colorToHex(c)
 		l.Text = hex + " (" + HexToName(hex) + ")"
@@ -91,10 +99,11 @@ func openPicker(w fyne.Window, l *widget.Label, r *canvas.Rectangle) {
 		r.Refresh()
 
 		selectedHex = hex
+
+		currentSimple = c
 	})
 	content := fyne.NewContainer(picker)
 
-	picker.SetColor(currentSimple)
 	dialog.ShowCustom("Select color", "OK", content, w)
 }
 
